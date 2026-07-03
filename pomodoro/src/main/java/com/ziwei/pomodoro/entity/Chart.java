@@ -1,5 +1,6 @@
 package com.ziwei.pomodoro.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
+@Schema(description = "创建命盘信息")
 public class Chart {
     private Long id;
     private LocalDate birthday;
