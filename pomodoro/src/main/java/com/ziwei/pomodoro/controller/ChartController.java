@@ -2,6 +2,8 @@ package com.ziwei.pomodoro.controller;
 
 import com.ziwei.pomodoro.entity.Chart;
 import com.ziwei.pomodoro.service.ChartService;
+import com.ziwei.pomodoro.service.SuggestionService;
+import com.ziwei.pomodoro.util.ZiWeiCalculator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,4 +35,24 @@ public class ChartController {
         LocalDate date = LocalDate.parse(birthday);
         return chartService.createChart(date, birthTime);
     }
+
+    /**
+     * 番茄钟策略分析
+     * @param birthday
+     * @param birthTime
+     * @return
+     */
+    @GetMapping("/analyze")
+    @Operation(summary = "番茄钟策略分析")
+    public ZiWeiCalculator.ChartResult analyze(
+            @RequestParam("birthday") String birthday,
+            @RequestParam(value = "birthTime", required = false) LocalTime birthTime) {
+        LocalDate date = LocalDate.parse(birthday);
+        ZiWeiCalculator.ChartResult result=chartService.analyze(date, birthTime);
+        return result;
+    }
+
+
+
+
 }

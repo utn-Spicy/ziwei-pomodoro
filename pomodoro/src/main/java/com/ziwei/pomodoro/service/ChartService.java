@@ -23,7 +23,6 @@ public class ChartService {
      * @param birthTime
      * @return
      */
-    @Operation(summary = "创建命盘分析", description = "根据出生日期（可选出生时间）获取命盘和番茄钟策略")
     public Chart createChart(LocalDate birthday, LocalTime birthTime){
         //1.调排盘引擎算
         ZiWeiCalculator.ChartResult result;
@@ -48,5 +47,20 @@ public class ChartService {
         return chart;
     }
 
+    /**
+     * 番茄钟策略
+     * @param birthday
+     * @param birthTime
+     * @return
+     */
+    public ZiWeiCalculator.ChartResult analyze(LocalDate birthday, LocalTime birthTime){
+        ZiWeiCalculator.ChartResult result;
+        if (birthTime !=null){
+            result = ZiWeiCalculator.calculate(birthday,birthTime);
+        }else{
+            result = ZiWeiCalculator.calculate(birthday);
+        }
+        return result;
+    }
 
 }

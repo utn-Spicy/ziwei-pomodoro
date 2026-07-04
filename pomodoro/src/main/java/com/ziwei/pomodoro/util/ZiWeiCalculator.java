@@ -1,5 +1,7 @@
 package com.ziwei.pomodoro.util;
 
+import lombok.Data;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -301,6 +303,7 @@ public class ZiWeiCalculator {
     // ========================================================================
 
     /** 番茄钟策略 */
+    @Data
     public static class PomodoroStrategy {
         public String  dayStemName;          // 日干
         public String  dayStemFull;          // 日干全称
@@ -329,6 +332,7 @@ public class ZiWeiCalculator {
     }
 
     /** 排盘结果 */
+    @Data
     public static class ChartResult {
         public int     yearStemIdx;
         public int     yearBranchIdx;

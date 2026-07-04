@@ -1,7 +1,9 @@
 package com.ziwei.pomodoro.controller;
 
+import com.ziwei.pomodoro.dto.PomodoroResultDTO;
 import com.ziwei.pomodoro.entity.PomodoroRecord;
 import com.ziwei.pomodoro.service.PomodoroService;
+import com.ziwei.pomodoro.service.SuggestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ public class PomodoroController {
 
     @Autowired
     private PomodoroService pomodoroService;
+
 
     /**
      *开始一个番茄钟
@@ -36,7 +39,7 @@ public class PomodoroController {
      */
     @Operation(summary = "完成一个番茄钟")
     @PutMapping("/{id}/complete")
-    public PomodoroRecord complete(@PathVariable Long id,@RequestParam Integer actualDuration){
+    public PomodoroRecord complete(@PathVariable Long id, @RequestParam Integer actualDuration){
         return pomodoroService.complete(id,actualDuration);
     }
 
