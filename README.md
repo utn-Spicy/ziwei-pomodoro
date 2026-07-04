@@ -6,7 +6,7 @@
 
 ## 致谢
 
-  - 紫微斗数排盘算法参考了 [iztro](https://github.com/SylarLong/iztro) 开源项目
+  - 紫微斗数排盘算法参考了 [renhuai123/ziwei-doushu](https://github.com/Renhuai123/ziwei-doushu) 开源项目
 
   ## 技术栈
 
