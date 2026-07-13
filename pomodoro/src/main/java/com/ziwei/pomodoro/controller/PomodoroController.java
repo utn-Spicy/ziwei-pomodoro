@@ -1,9 +1,8 @@
 package com.ziwei.pomodoro.controller;
 
-import com.ziwei.pomodoro.dto.PomodoroResultDTO;
+import com.ziwei.pomodoro.dto.ResultDTO;
 import com.ziwei.pomodoro.entity.PomodoroRecord;
 import com.ziwei.pomodoro.service.PomodoroService;
-import com.ziwei.pomodoro.service.SuggestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,8 @@ public class PomodoroController {
      */
     @Operation(summary = "开始一个番茄钟")
     @PostMapping("/start")
-    public PomodoroRecord start(@RequestParam Integer duration){
-        return pomodoroService.start(duration);
+    public ResultDTO<PomodoroRecord> start(@RequestParam Integer duration){
+        return ResultDTO.success(pomodoroService.start(duration));
     }
 
     /**
@@ -39,8 +38,8 @@ public class PomodoroController {
      */
     @Operation(summary = "完成一个番茄钟")
     @PutMapping("/{id}/complete")
-    public PomodoroRecord complete(@PathVariable Long id, @RequestParam Integer actualDuration){
-        return pomodoroService.complete(id,actualDuration);
+    public ResultDTO<PomodoroRecord> complete(@PathVariable Long id, @RequestParam Integer actualDuration){
+        return ResultDTO.success(pomodoroService.complete(id,actualDuration));
     }
 
     /**
@@ -50,8 +49,8 @@ public class PomodoroController {
      */
     @Operation(summary = "中断一个番茄钟")
     @PutMapping("/{id}/interrupt")
-    public PomodoroRecord interrupt(@PathVariable Long id){
-        return pomodoroService.interrupt(id);
+    public ResultDTO<PomodoroRecord> interrupt(@PathVariable Long id){
+        return ResultDTO.success(pomodoroService.interrupt(id));
     }
 
     /**
@@ -70,7 +69,7 @@ public class PomodoroController {
      */
     @Operation(summary = "查询当前正在运行中的番茄钟")
     @GetMapping("/running")
-    public PomodoroRecord getRunningRecord(){
-        return  pomodoroService.getRunningRecord();
+    public ResultDTO<PomodoroRecord> getRunningRecord(){
+        return  ResultDTO.success(pomodoroService.getRunningRecord());
     }
 }

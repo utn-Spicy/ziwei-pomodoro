@@ -3,18 +3,34 @@ package com.ziwei.pomodoro.service;
 import com.ziwei.pomodoro.entity.PomodoroRecord;
 import com.ziwei.pomodoro.mapper.PomodoroRecordMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Transactional
 @Service
 public class PomodoroService {
 
     @Autowired
     private PomodoroRecordMapper pomodoroRecordMapper;
+
+    @Autowired
+    private SuggestionService suggestionService;
+
+    /**
+     * 线程池成员变量
+     */
+    private final ThreadPoolExecutor aiExecutor = new ThreadPoolExecutor(
+            2,40,50, TimeUnit.SECONDS,
+            new LinkedBlockingDeque<>(10)
+    );
 
     /**
      * 开始一个番茄钟
@@ -32,6 +48,7 @@ public class PomodoroService {
 
     /**
      * 完成一个番茄钟
+     *
      * @param id
      * @param actualDuration
      * @return
@@ -77,4 +94,26 @@ public class PomodoroService {
     public PomodoroRecord getRunningRecord(){
         return pomodoroRecordMapper.findRunning();
     }
+
+    /**
+     *AI异步调用
+     * @param recordID
+     * @param personalityType
+     * @param element
+     * @param status
+     */
+    @Operation(summary = "AI异步调用")
+    public void generateSuggestionAsync(Long recordID, String personalityType, String element, Integer status){
+        aiExecutor.execute(() -> {
+            try {
+                String suggestion = suggestionService.generateSuggestion(
+                        personalityType, element, status
+                );
+                log.info("AI语录生成成功：" + suggestion);
+            } catch (Exception e){
+                log.error("AI语录生成失败：" + e.getMessage());
+            }
+        });
+    }
+
 }

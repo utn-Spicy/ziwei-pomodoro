@@ -1,11 +1,15 @@
 package com.ziwei.pomodoro.service;
 
 import com.ziwei.pomodoro.config.DeepSeekConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;
+import java.util.logging.Logger;
 
+@Slf4j
 @Service
 public class SuggestionService {
 
@@ -64,7 +68,7 @@ public class SuggestionService {
                 return ((String) message.get("content")).trim();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("调用DeepSeek API失败", e);
         }
         return element + "命前行 自有天时";
     }
