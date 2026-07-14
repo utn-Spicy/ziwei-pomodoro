@@ -1,6 +1,7 @@
 package com.ziwei.pomodoro.controller;
 
-import com.ziwei.pomodoro.dto.ResultDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ziwei.pomodoro.common.Result;
 import com.ziwei.pomodoro.entity.PomodoroRecord;
 import com.ziwei.pomodoro.service.PomodoroService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,8 +27,8 @@ public class PomodoroController {
      */
     @Operation(summary = "开始一个番茄钟")
     @PostMapping("/start")
-    public ResultDTO<PomodoroRecord> start(@RequestParam Integer duration){
-        return ResultDTO.success(pomodoroService.start(duration));
+    public Result<PomodoroRecord> start(@RequestParam Integer duration) throws JsonProcessingException {
+        return Result.success(pomodoroService.start(duration));
     }
 
     /**
@@ -38,8 +39,8 @@ public class PomodoroController {
      */
     @Operation(summary = "完成一个番茄钟")
     @PutMapping("/{id}/complete")
-    public ResultDTO<PomodoroRecord> complete(@PathVariable Long id, @RequestParam Integer actualDuration){
-        return ResultDTO.success(pomodoroService.complete(id,actualDuration));
+    public Result<PomodoroRecord> complete(@PathVariable Long id, @RequestParam Integer actualDuration){
+        return Result.success(pomodoroService.complete(id,actualDuration));
     }
 
     /**
@@ -49,8 +50,8 @@ public class PomodoroController {
      */
     @Operation(summary = "中断一个番茄钟")
     @PutMapping("/{id}/interrupt")
-    public ResultDTO<PomodoroRecord> interrupt(@PathVariable Long id){
-        return ResultDTO.success(pomodoroService.interrupt(id));
+    public Result<PomodoroRecord> interrupt(@PathVariable Long id){
+        return Result.success(pomodoroService.interrupt(id));
     }
 
     /**
@@ -59,8 +60,8 @@ public class PomodoroController {
      */
     @Operation(summary = "查询今日番茄钟记录")
     @GetMapping("/today")
-    public List<PomodoroRecord> getTodayRecords(){
-        return pomodoroService.getTodayRecords();
+    public Result<List<PomodoroRecord>> getTodayRecords(){
+        return Result.success(pomodoroService.getTodayRecords());
     }
 
     /**
@@ -69,7 +70,7 @@ public class PomodoroController {
      */
     @Operation(summary = "查询当前正在运行中的番茄钟")
     @GetMapping("/running")
-    public ResultDTO<PomodoroRecord> getRunningRecord(){
-        return  ResultDTO.success(pomodoroService.getRunningRecord());
+    public Result<PomodoroRecord> getRunningRecord() throws JsonProcessingException {
+        return  Result.success(pomodoroService.getRunningRecord());
     }
 }

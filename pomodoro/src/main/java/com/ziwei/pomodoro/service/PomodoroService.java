@@ -1,10 +1,13 @@
 package com.ziwei.pomodoro.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ziwei.pomodoro.entity.PomodoroRecord;
 import com.ziwei.pomodoro.mapper.PomodoroRecordMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,12 @@ public class PomodoroService {
     @Autowired
     private SuggestionService suggestionService;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     /**
      * 线程池成员变量
      */
@@ -38,11 +47,12 @@ public class PomodoroService {
      * @return
      */
     @Operation(summary = "开始一个番茄钟")
-    public PomodoroRecord start(Integer duration){
+    public PomodoroRecord start(Integer duration) throws JsonProcessingException {
         PomodoroRecord record = new PomodoroRecord();
         record.setDuration(duration);
         record.setStatus(0);//RUNNING
         pomodoroRecordMapper.start(record);
+        stringRedisTemplate.opsForValue().set("pomodoro:running", objectMapper.writeValueAsString(record),duration+1,TimeUnit.MINUTES);
         return record;
     }
 
@@ -91,8 +101,13 @@ public class PomodoroService {
      * @return
      */
     @Operation(summary = "查询当前正在运行中的番茄钟")
-    public PomodoroRecord getRunningRecord(){
-        return pomodoroRecordMapper.findRunning();
+    public PomodoroRecord getRunningRecord() throws JsonProcessingException {
+        String runningRecord = stringRedisTemplate.opsForValue().get("pomodoro:running");
+        if (runningRecord == null){
+            return pomodoroRecordMapper.findRunning();
+        } else {
+            return objectMapper.readValue(runningRecord, PomodoroRecord.class);
+        }
     }
 
     /**

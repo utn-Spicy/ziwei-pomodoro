@@ -1,5 +1,6 @@
 package com.ziwei.pomodoro.controller;
 
+import com.ziwei.pomodoro.common.Result;
 import com.ziwei.pomodoro.entity.Chart;
 import com.ziwei.pomodoro.service.ChartService;
 import com.ziwei.pomodoro.service.SuggestionService;
@@ -29,11 +30,11 @@ public class ChartController {
      */
     @Operation(summary = "创建命盘分析", description = "根据出生日期（可选出生时间）获取命盘和番茄钟策略")
     @GetMapping("/create")
-    public Chart create(
+    public Result<Chart> create(
             @RequestParam("birthday") String birthday,
             @RequestParam(value = "birthTime", required = false )LocalTime birthTime){
         LocalDate date = LocalDate.parse(birthday);
-        return chartService.createChart(date, birthTime);
+        return Result.success(chartService.createChart(date, birthTime));
     }
 
     /**
@@ -44,12 +45,12 @@ public class ChartController {
      */
     @GetMapping("/analyze")
     @Operation(summary = "番茄钟策略分析")
-    public ZiWeiCalculator.ChartResult analyze(
+    public Result<ZiWeiCalculator.ChartResult> analyze(
             @RequestParam("birthday") String birthday,
             @RequestParam(value = "birthTime", required = false) LocalTime birthTime) {
         LocalDate date = LocalDate.parse(birthday);
         ZiWeiCalculator.ChartResult result=chartService.analyze(date, birthTime);
-        return result;
+        return Result.success(result);
     }
 
 
