@@ -2,6 +2,7 @@ package com.ziwei.pomodoro.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ziwei.pomodoro.common.BaseContext;
 import com.ziwei.pomodoro.entity.PomodoroRecord;
 import com.ziwei.pomodoro.mapper.PomodoroRecordMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -49,10 +51,15 @@ public class PomodoroService {
     @Operation(summary = "开始一个番茄钟")
     public PomodoroRecord start(Integer duration) throws JsonProcessingException {
         PomodoroRecord record = new PomodoroRecord();
+        Long userId = BaseContext.getCurrentId();
+        record.setUserId(userId);
         record.setDuration(duration);
         record.setStatus(0);//RUNNING
+        record.setStartedAt(LocalDateTime.now());
+        record.setCreatedAt(LocalDateTime.now());
+        record.setUpdatedAt(LocalDateTime.now());
         pomodoroRecordMapper.start(record);
-        stringRedisTemplate.opsForValue().set("pomodoro:running", objectMapper.writeValueAsString(record),duration+1,TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set("pomodoro:running:" + userId, objectMapper.writeValueAsString(record),duration+1,TimeUnit.MINUTES);
         return record;
     }
 
@@ -65,11 +72,14 @@ public class PomodoroService {
      */
     @Operation(summary = "完成一个番茄钟")
     public PomodoroRecord complete(Long id,Integer actualDuration){
+        Long userId = BaseContext.getCurrentId();
         PomodoroRecord record = new PomodoroRecord();
         record.setId(id);
         record.setStatus(1);//COMPLETED
         record.setActualDuration(actualDuration);
+        record.setEndedAt(LocalDateTime.now());
         pomodoroRecordMapper.end(record);
+        stringRedisTemplate.delete("pomodoro:running:" + userId);
         return record;
     }
 
@@ -80,10 +90,13 @@ public class PomodoroService {
      */
     @Operation(summary = "中断一个番茄钟")
     public PomodoroRecord interrupt(Long id){
+        Long userId = BaseContext.getCurrentId();
         PomodoroRecord record = new PomodoroRecord();
         record.setId(id);
         record.setStatus(2);//INTERRUPTED
+        record.setEndedAt(LocalDateTime.now());
         pomodoroRecordMapper.end(record);
+        stringRedisTemplate.delete("pomodoro:running:" + userId);
         return record;
     }
 
@@ -93,7 +106,7 @@ public class PomodoroService {
      */
     @Operation(summary = "查询今日番茄钟记录")
     public List<PomodoroRecord> getTodayRecords(){
-        return pomodoroRecordMapper.findTodayRecords();
+        return pomodoroRecordMapper.findTodayRecords(BaseContext.getCurrentId());
     }
 
     /**
@@ -102,7 +115,8 @@ public class PomodoroService {
      */
     @Operation(summary = "查询当前正在运行中的番茄钟")
     public PomodoroRecord getRunningRecord() throws JsonProcessingException {
-        String runningRecord = stringRedisTemplate.opsForValue().get("pomodoro:running");
+        Long userId = BaseContext.getCurrentId();
+        String runningRecord = stringRedisTemplate.opsForValue().get("pomodoro:running:" + userId);
         if (runningRecord == null){
             return pomodoroRecordMapper.findRunning();
         } else {

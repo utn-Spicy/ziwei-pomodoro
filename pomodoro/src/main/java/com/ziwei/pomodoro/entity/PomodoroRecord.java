@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class PomodoroRecord {
     private Long id;
+    private Long userId;
     private Integer duration;
     private Integer actualDuration;
     private Integer status;
