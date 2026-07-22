@@ -52,12 +52,9 @@ public class PomodoroService {
     public PomodoroRecord start(Integer duration) throws JsonProcessingException {
         PomodoroRecord record = new PomodoroRecord();
         Long userId = BaseContext.getCurrentId();
-        record.setUserId(userId);
         record.setDuration(duration);
         record.setStatus(0);//RUNNING
-        record.setStartedAt(LocalDateTime.now());
-        record.setCreatedAt(LocalDateTime.now());
-        record.setUpdatedAt(LocalDateTime.now());
+
         pomodoroRecordMapper.start(record);
         stringRedisTemplate.opsForValue().set("pomodoro:running:" + userId, objectMapper.writeValueAsString(record),duration+1,TimeUnit.MINUTES);
         return record;
